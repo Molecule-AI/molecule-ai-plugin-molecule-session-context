@@ -1,56 +1,82 @@
-# molecule-session-context — Molecule AI Plugin
+# molecule-session-context — Session Start Context Loader
 
-Plugin that auto-loads recent cron-learnings and repo PR/issue counts at session start. Pairs with `molecule-cron-learnings`.
+`molecule-session-context` is a **session-initialisation hook plugin** that
+auto-loads recent cron-learnings and repo PR/issue counts at `SessionStart`.
+Pairs with `molecule-cron-learnings`.
 
-## Overview
+**Version:** 1.0.0
+**Runtime:** `claude_code`
 
-Session-context plugin injects recent cron-learnings and repository activity summaries into the agent's context at session start. Designed for `claude_code` runtime.
+---
 
-## Build and Test
+## Repository Layout
+
+```
+molecule-session-context/
+├── plugin.yaml              — Plugin manifest
+├── hooks/
+│   └── session-start-context/
+│       └── hook.json        — SessionStart hook definition
+└── adapters/               — Harness adaptors
+```
+
+---
+
+## What It Does
+
+At the start of every session, this hook:
+1. Reads the last N lines of `~/.claude/projects/<project>/cron-learnings.jsonl`
+2. Loads current PR/issue counts for the workspace repo
+3. Surfaces this context to the agent in the first response
+
+This means the agent enters every session already knowing:
+- What went wrong last time (from cron-learnings)
+- How many open PRs and issues exist (context before acting)
+
+---
+
+## SessionStart Hook
+
+The hook fires on every new session for a workspace. Configure how many
+learnings to load via workspace settings:
+
+```json
+{
+  "session_context": {
+    "learnings_lines": 20,
+    "include_pr_counts": true,
+    "include_issue_counts": true
+  }
+}
+```
+
+---
+
+## Development
+
+### Prerequisites
+
+- Python 3.11+
+- `gh` CLI authenticated
+- Write access to `Molecule-AI/molecule-ai-plugin-molecule-session-context`
+
+### Setup
 
 ```bash
-# Validate plugin structure
-python3 .molecule-ci/scripts/validate-plugin.py
+git clone https://github.com/Molecule-AI/molecule-ai-plugin-molecule-session-context.git
+cd molecule-ai-plugin-molecule-session-context
 
-# Install dependencies
-pip install -r .molecule-ci/scripts/requirements.txt
+# YAML validation
+python3 -c "import yaml; yaml.safe_load(open('plugin.yaml'))"
 ```
 
-## Project Structure
-
-```
-.                       # Plugin root
-plugin.yaml             # Plugin manifest
-SKILL.md                # agentskills.io spec
-.claude/                 # Agent settings
-.molecule-ci/
-  scripts/
-    validate-plugin.py  # plugin.yaml + content validator
-    requirements.txt    # Python deps
-runbooks/
-  local-dev-setup.md    # Local development guide
-```
-
-## Plugin Manifest
-
-```yaml
-name: molecule-session-context
-version: 1.0.0
-description: Auto-load recent cron-learnings + repo PR/issue counts at SessionStart
-author: Molecule AI
-runtimes:
-  - claude_code
-hooks:
-  - session-start-context
-```
-
-## Pre-commit Checklist
+### Pre-Commit Checklist
 
 ```bash
-# 1. Validate plugin.yaml structure
-python3 .molecule-ci/scripts/validate-plugin.py
+# YAML structure
+python3 -c "import yaml; yaml.safe_load(open('plugin.yaml'))"
 
-# 2. Check for credentials (Python-based — no literal secret patterns)
+# Credential scan
 python3 -c "
 import re, sys
 with open('plugin.yaml') as f:
@@ -61,13 +87,20 @@ if any(re.search(p, content) for p in patterns):
     sys.exit(1)
 print('No credentials: OK')
 "
-
-# 3. Verify plugin.yaml is valid YAML
-python3 -c "import yaml; yaml.safe_load(open('plugin.yaml'))"
-
-echo "All checks passed"
 ```
 
-## Release
+---
 
-Version bumps in `plugin.yaml` → tag and push → platform registry publishes.
+## Release Process
+
+1. Review changes: `git log origin/main..HEAD --oneline`
+2. Bump `version` in `plugin.yaml` (semver)
+3. Commit: `chore: bump version to X.Y.Z`
+4. Tag and push: `git tag vX.Y.Z && git push origin main --tags`
+5. Create GitHub Release with changelog
+
+---
+
+## Known Issues
+
+See `known-issues.md` at the repo root.

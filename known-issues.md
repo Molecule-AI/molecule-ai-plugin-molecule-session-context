@@ -1,36 +1,54 @@
-# Known Issues — molecule-ai-plugin-molecule-session-context
-
-Issues identified in this plugin repo (GH_TOKEN may be unavailable in automated agent contexts). Each entry has: location, symptom, impact, suggested fix.
-
-```
-## KI-N — Short title
-
-**File:** `<path>:<line>`
-**Status:** TODO / identified / partially fixed
-**Severity:** Critical / High / Medium / Low
-
-### Symptom
-...
-
-### Impact
-...
-
-### Suggested fix
-...
----
-```
+# Known Issues — molecule-session-context
 
 ---
 
-**Policy:** File a GitHub issue before patching silently. Do not merge a workaround without a linked issue.
+## Active Issues
 
-**Before opening an issue, check:**
-- The [open issues](https://github.com/Molecule-AI/molecule-ai-plugin-molecule-session-context/issues)
-- Platform constraints in `docs/development/constraints-and-rules.md`
+*(None currently open. This section is updated when issues are filed.)*
 
-### Severity Definitions
+---
 
-- **Critical:** Plugin fails to install or crashes the agent runtime
-- **High:** Plugin produces wrong/broken behavior in normal use
-- **Medium:** UX degraded, workaround exists
-- **Low:** Cosmetic, negligible user impact
+## Recently Resolved
+
+*(No recently resolved issues.)*
+
+---
+
+## How to Update This File
+
+When a new issue is identified:
+1. Add it under **Active Issues** using the template below
+2. Include: symptom, cause (if known), workaround
+3. When fixed, move to **Recently Resolved** and note the fix version
+
+### Issue Template
+
+```markdown
+## [TICKET-NUMBER] <Short Title>
+
+**Severity:** P0 / P1 / P2 / P3
+**Status:** Workaround / Fix in progress / Fix available
+**Affected versions:** All / vX.Y.Z+
+
+**Symptoms:**
+**Cause:**
+**Workaround:**
+**Fix (if available):**
+```
+
+---
+
+## Severity Definitions
+
+| Level | Description |
+|---|---|
+| P0 | Session start crashes; no context loaded |
+| P1 | Context loaded but wrong workspace |
+| P2 | Context stale or missing learnings |
+| P3 | Cosmetic or documentation issue |
+
+---
+
+## Reporting
+
+Use the Molecule-AI/internal issue tracker. Tag with `plugin-molecule-session-context`.
